@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[97367,["/_next/static/chunks/0bziuysnpy9_9.js","/_next/static/chunks/0d3shmwh5_nmn.js"],"OutletBoundary"]
+3:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_100%)] px-6 py-12","children":["$","div",null,{"className":"mx-auto max-w-4xl rounded-[28px] border border-border bg-background p-8 shadow-sm","children":[["$","div",null,{"className":"inline-flex rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground","children":"占位页"}],["$","h1",null,{"className":"mt-4 text-3xl font-semibold tracking-tight","children":"MenuManagement 暂未迁移"}],["$","p",null,{"className":"mt-3 text-sm leading-7 text-muted-foreground","children":"这个入口文件之前已经存在，但对应 feature 组件缺失，导致整个 nquiz 工程无法通过 build。 当前先补最小占位页，确保不因为悬空 import 阻塞其他需求开发闭环。"}]]}]}],null,["$","$L2",null,{"children":["$","$3",null,{"name":"Next.MetadataOutlet","children":"$@4"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"bmGWKDYVueD9diOyMh3_A"}
+4:null

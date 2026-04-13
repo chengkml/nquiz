@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/price-monitor/layout,_N_T_/price-monitor/page,_N_T_/price-monitor"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/price-monitor/__PAGE__",
+    "/price-monitor",
+    "/_index",
+    "/_head"
+  ]
+}

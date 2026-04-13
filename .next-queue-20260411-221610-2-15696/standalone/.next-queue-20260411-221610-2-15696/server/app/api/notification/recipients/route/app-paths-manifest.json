@@ -1,0 +1,3 @@
+{
+  "/api/notification/recipients/route": "app/api/notification/recipients/route.js"
+}

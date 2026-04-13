@@ -1,0 +1,18 @@
+[Unit]
+Description=nquiz Next.js standalone app
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/opt/nquiz/current
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+Environment=PORT=3000
+# 按服务器实际 which node 结果调整。
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

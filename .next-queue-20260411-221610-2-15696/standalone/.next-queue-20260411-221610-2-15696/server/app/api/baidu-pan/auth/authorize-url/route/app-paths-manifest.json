@@ -1,0 +1,3 @@
+{
+  "/api/baidu-pan/auth/authorize-url/route": "app/api/baidu-pan/auth/authorize-url/route.js"
+}

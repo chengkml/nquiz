@@ -1,0 +1,113 @@
+# 必填 GitHub Secrets:
+# - SERVER_HOST: 部署服务器地址
+# - SERVER_USER: SSH 登录用户
+# - SERVER_SSH_KEY: SSH 私钥
+#
+# 可选 GitHub Variables:
+# - DEPLOY_PATH: 服务器上的发布根目录，默认 /opt/nquiz
+# - SYSTEMD_SERVICE: 重启的 systemd 服务名，默认 nquiz
+# - KEEP_RELEASES: 保留的历史版本数量，默认 5
+#
+# 服务器前置条件:
+# - 已安装 Node.js（运行 standalone server.js 用）
+# - SERVER_USER 对 DEPLOY_PATH 有写权限
+# - SERVER_USER 可无密码执行 systemctl restart/status 对应服务
+# - 服务器已提前安装并启用对应的 systemd 服务
+
+name: nquiz构建发布
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: nquiz-build-and-deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 配置 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建应用
+        run: npm run build
+
+      - name: 组装 standalone 发布包
+        env:
+          BUNDLE_NAME: nquiz-${{ github.sha }}.tar.gz
+        run: |
+          set -euo pipefail
+
+          mkdir -p .next/standalone/.next
+          cp -r public .next/standalone/
+          cp -r .next/static .next/standalone/.next/
+          tar -C .next/standalone -czf "$BUNDLE_NAME" .
+
+      - name: 上传发布包到服务器
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          source: nquiz-${{ github.sha }}.tar.gz
+          target: /tmp/
+          overwrite: true
+
+      - name: 解压发布并重启服务
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+          SYSTEMD_SERVICE: ${{ vars.SYSTEMD_SERVICE }}
+          KEEP_RELEASES: ${{ vars.KEEP_RELEASES }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script_stop: true
+          envs: GITHUB_SHA,DEPLOY_PATH,SYSTEMD_SERVICE,KEEP_RELEASES
+          script: |
+            set -euo pipefail
+
+            DEPLOY_PATH="${DEPLOY_PATH:-/opt/nquiz}"
+            SYSTEMD_SERVICE="${SYSTEMD_SERVICE:-nquiz}"
+            KEEP_RELEASES="${KEEP_RELEASES:-5}"
+            BUNDLE_PATH="/tmp/nquiz-${GITHUB_SHA}.tar.gz"
+            RELEASE_DIR="$DEPLOY_PATH/releases/$GITHUB_SHA"
+            CURRENT_LINK="$DEPLOY_PATH/current"
+
+            mkdir -p "$DEPLOY_PATH/releases"
+            rm -rf "$RELEASE_DIR"
+            mkdir -p "$RELEASE_DIR"
+            tar -xzf "$BUNDLE_PATH" -C "$RELEASE_DIR"
+            ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"
+            rm -f "$BUNDLE_PATH"
+
+            sudo systemctl cat "$SYSTEMD_SERVICE" >/dev/null
+            sudo systemctl restart "$SYSTEMD_SERVICE"
+            sudo systemctl status "$SYSTEMD_SERVICE" --no-pager
+
+            if [ "$KEEP_RELEASES" -gt 0 ]; then
+              ls -1dt "$DEPLOY_PATH"/releases/* 2>/dev/null | tail -n +"$((KEEP_RELEASES + 1))" | xargs -r rm -rf
+            fi

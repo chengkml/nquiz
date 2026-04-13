@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/vocabulary/layout,_N_T_/vocabulary/proficiency/layout,_N_T_/vocabulary/proficiency/page,_N_T_/vocabulary/proficiency"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/vocabulary/proficiency/__PAGE__",
+    "/vocabulary/proficiency",
+    "/vocabulary",
+    "/_index",
+    "/_head"
+  ]
+}

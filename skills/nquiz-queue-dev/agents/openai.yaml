@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nquiz Queue Dev"
+  short_description: "Concurrency-safe queue runner: unique state per run and locked OPEN picking."
+  default_prompt: "Use this skill to keep querying OPEN requirements in project nquiz and repeatedly perform the full real development loop until the queue is empty. Ignore historical unfinished activeRequirementId from previous runs. In concurrent mode, always create a unique per-run state file and use skills/nquiz-queue-dev/scripts/pick_open_with_lock.py for claim serialization when picking next OPEN requirement. Never stop after one completed item. Before any final answer, run a fresh post-complete queue query and confirm OPEN=0."

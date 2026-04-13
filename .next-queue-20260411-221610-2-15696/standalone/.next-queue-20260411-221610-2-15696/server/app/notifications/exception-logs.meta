@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/notifications/layout,_N_T_/notifications/exception-logs/layout,_N_T_/notifications/exception-logs/page,_N_T_/notifications/exception-logs"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/notifications/exception-logs/__PAGE__",
+    "/notifications/exception-logs",
+    "/notifications",
+    "/_index",
+    "/_head"
+  ]
+}

@@ -1,0 +1,3 @@
+{
+  "/api/notifications/exception-logs/[id]/retry/route": "app/api/notifications/exception-logs/[id]/retry/route.js"
+}

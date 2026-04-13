@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/knowledge/layout,_N_T_/knowledge/mastery/layout,_N_T_/knowledge/mastery/page,_N_T_/knowledge/mastery"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/knowledge/mastery/__PAGE__",
+    "/knowledge/mastery",
+    "/knowledge",
+    "/_index",
+    "/_head"
+  ]
+}

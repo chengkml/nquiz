@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/mcp-tool/layout,_N_T_/mcp-tool/page,_N_T_/mcp-tool"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/mcp-tool/__PAGE__",
+    "/mcp-tool",
+    "/_index",
+    "/_head"
+  ]
+}

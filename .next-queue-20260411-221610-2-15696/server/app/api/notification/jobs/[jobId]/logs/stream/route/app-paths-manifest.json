@@ -1,0 +1,3 @@
+{
+  "/api/notification/jobs/[jobId]/logs/stream/route": "app/api/notification/jobs/[jobId]/logs/stream/route.js"
+}

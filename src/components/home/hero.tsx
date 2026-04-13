@@ -1,13 +1,31 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
+  AlarmClock,
   ArrowRight,
+  BarChart3,
+  BookOpen,
+  Bot,
+  BellRing,
+  BrainCircuit,
+  Bug,
+  CalendarDays,
   Database,
+  DatabaseZap,
   FormInput,
+  FileCode2,
+  FileText,
+  FolderTree,
   Layers3,
+  ListTodo,
   PanelTop,
+  Server,
+  ShieldCheck,
   Sparkles,
+  Tags,
+  Workflow,
 } from "lucide-react";
 
 const stack = [
@@ -27,6 +45,186 @@ export function Hero() {
         transition={{ duration: 0.45 }}
         className="space-y-6"
       >
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/requirements"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开需求管理页
+            <FileCode2 className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/notification/send"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开通知发送页
+            <BellRing className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/notifications/exception-logs"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开通知异常日志页
+            <Bug className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/chat"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开独立对话页
+            <BrainCircuit className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/mcp-server"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开 MCP 服务器页
+            <Server className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/agent"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开 Agent 管理页
+            <Bot className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/mcp-tool"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开 MCP 工具页
+            <DatabaseZap className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/orchestration"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开编排工作台
+            <Workflow className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/datasource"
+            className="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black/85 dark:bg-white dark:text-black dark:hover:bg-white/90"
+          >
+            打开 DatasourceManagement
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/func-docs"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开 FuncDocManagement
+            <FileText className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/wrong-question"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开 WrongQuestion
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/statistics-center/question-bank"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开题库统计页
+            <BarChart3 className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/life-countdown"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开生命倒计时页
+            <AlarmClock className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/schedule"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开日程管理页
+            <CalendarDays className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/admin/integrations/baidu-pan"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开百度网盘接入页
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/price-monitor"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开价格监控页
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/todo"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开 TodoManagement
+            <ListTodo className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/vocabulary/proficiency"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开单词熟练度统计页
+            <BookOpen className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/subjects"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开学科管理页
+            <Tags className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/groups"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开分组管理页
+            <FolderTree className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/hot-search"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开热搜页
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/diary"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开日记管理页
+            <BookOpen className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/system/roles"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开角色管理页
+            <ShieldCheck className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/knowledge/personal"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开个人知识页
+            <BookOpen className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/knowledge/sets"
+            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black transition hover:bg-black/5 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          >
+            打开知识集管理页
+            <Database className="h-4 w-4" />
+          </Link>
+          <span className="inline-flex items-center rounded-xl border border-black/10 px-4 py-2.5 text-sm text-black/60 dark:border-white/10 dark:text-white/60">
+            已迁移首期：需求管理页 / 通知发送页 / 通知异常日志页 / 独立对话页 / MCP 服务器页 / Agent 管理页 / MCP 工具页 / 编排工作台 / DatasourceManagement / FuncDocManagement / WrongQuestion / 题库统计页 / 单词熟练度统计页 / 生命倒计时 / 日程管理 / 百度网盘接入页 / 价格监控页 / TodoManagement / SubjectManagement / GroupManagement / 角色管理页 / 热搜页 / 日记管理页 / 个人知识页 / 知识集管理页
+          </span>
+        </div>
         <span className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/5 px-3 py-1 text-sm text-black/70 dark:border-white/10 dark:bg-white/5 dark:text-white/70">
           <Sparkles className="h-4 w-4" />
           nquiz · quiz 的 Next.js 重构工程

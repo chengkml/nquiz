@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/statistics-center/layout,_N_T_/statistics-center/question-bank/layout,_N_T_/statistics-center/question-bank/page,_N_T_/statistics-center/question-bank"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/statistics-center/question-bank/__PAGE__",
+    "/statistics-center/question-bank",
+    "/statistics-center",
+    "/_index",
+    "/_head"
+  ]
+}

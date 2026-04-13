@@ -1,0 +1,216 @@
+结论：
+该需求适合在 nquiz 中按“热搜浏览 + 个人关注主题管理”两个子能力做一个菜单级闭环迁移，不建议机械照搬 quiz 的 Arco 双栏页。核心业务语义应保留：按来源浏览已入库热搜、按标题筛选、只看命中关注主题、查看热搜详情、按用户维护关注主题并自动做标题关键词命中。实现上应切到 Next.js App Router + Tailwind + Shadcn UI + TanStack Query，数据层与页面状态拆分清楚；热搜“采集/导入”能力不必和首期页面同时落地，但要保留后端数据接入边界。
+
+一、页面定位与真实代码现状
+1. 旧页面入口与路由
+- 前端页面：quiz/frontend/src/pages/HotSearch/index.tsx
+- 前端接口定义：quiz/frontend/src/pages/HotSearch/api.ts
+- 前端样式：quiz/frontend/src/pages/HotSearch/style/index.less
+- 路由注册：quiz/frontend/src/router/index.tsx（path: hot-search，requiredPath: hot-search）
+- 菜单初始化：quiz/backend/src/main/resources/db/migration/V202603262300__add_hot_search_menu.sql，菜单挂在 statistics_center 下，菜单名/ID 为 hot_search，标题为“热搜展示”
+
+2. 后端真实实现
+- 热搜接口：quiz/backend/src/main/java/com/ck/quiz/hotsearch/controller/HotSearchController.java
+- 关注主题接口：quiz/backend/src/main/java/com/ck/quiz/hotsearch/controller/HotSearchFollowTopicController.java
+- 热搜查询/导入逻辑：quiz/backend/src/main/java/com/ck/quiz/hotsearch/service/impl/HotSearchServiceImpl.java
+- 关注主题 CRUD 逻辑：quiz/backend/src/main/java/com/ck/quiz/hotsearch/service/impl/HotSearchFollowTopicServiceImpl.java
+- 热搜记录仓储：quiz/backend/src/main/java/com/ck/quiz/hotsearch/repository/HotSearchRecordRepository.java
+- 关注主题仓储：quiz/backend/src/main/java/com/ck/quiz/hotsearch/repository/HotSearchFollowTopicRepository.java
+- 热搜记录表：quiz/backend/src/main/resources/db/migration/V202603262255__create_hot_search_record_table.sql
+- 关注主题表：quiz/backend/src/main/resources/db/migration/V202604042140__create_hot_search_follow_topic_table.sql
+
+3. nquiz 当前基线
+- 目前 nquiz 还是骨架工程，只有基础 App Router 和 Query Provider：src/app/layout.tsx、src/components/providers/app-providers.tsx、src/components/providers/query-provider.tsx
+- 当前没有热搜模块、没有业务 API 层、没有后台管理布局、没有鉴权/菜单体系，说明这次分析不能假设“已有管理后台能力可以直接复用”，需要把热搜页当作一个新增菜单模块来设计。
+
+二、旧 quiz 页面真实功能边界
+1. 已有能力
+- 选择来源后查看热搜列表（当前前端只暴露 TOUTIAO）
+- 按标题关键词筛选
+- 切换“全部热搜 / 只看关注”
+- 分页查看热搜记录
+- 点击列表行查看右侧详情
+- 展示命中的关注主题标签
+- 管理关注主题：新增、编辑、删除、启停、排序
+
+2. 隐含但真实存在的业务语义
+- 热搜数据不是人工录入，而是“外部采集后按 source + batchNo 导入数据库”
+- 列表默认按 crawlTime 倒序、rankIndex 升序，优先展示最新抓取批次附近的数据
+- 关注主题是“按当前登录用户隔离”的个人配置，不是全局主题库
+- 主题命中规则是标题 contains 关键词，大小写不敏感；关键词支持逗号/换行分隔；若 keywords 为空则退回 topicName 本身参与匹配
+- 当选择“只看关注”且当前用户没有任何启用主题时，后端会直接返回空列表
+
+3. 不应误判为页面核心能力的部分
+- /api/hot-search/latest 和 /api/hot-search/{id} 接口虽存在，但当前页面主链路实际上用的是 search 返回的数据直接渲染详情，没有单独走详情拉取
+- 系统内置定时采集已经停用：quiz/backend/src/main/java/com/ck/quiz/hotsearch/schedule/HotSearchScheduler.java 为空实现；当前定位是“外部系统抓取后经 /import 写入”
+- ToutiaoHotSearchCollector 仍然保留，但更多是采集适配示例，不应把“站内定时爬取”作为 nquiz 首期页面必须交付的前提
+
+三、真实数据结构与接口语义
+1. 热搜记录结构（旧表 hot_search_record）
+关键字段：
+- source：来源
+- externalId：来源侧外部 ID
+- title：标题
+- url：原文链接
+- hotValue：热度值
+- rankIndex：榜单排序
+- crawlTime：抓取时间
+- batchNo：抓取批次
+- detailMarkdown：详情 markdown
+- extraJson：来源扩展 JSON
+
+2. 关注主题结构（旧表 hot_search_follow_topic）
+关键字段：
+- topicName：主题名
+- keywords：匹配关键词集合
+- enabled：是否启用
+- seq：排序
+- createUser：主题归属用户
+
+3. 旧接口语义
+- POST /api/hot-search/search：分页搜索热搜，支持 source/titleKeyword/fromTime/toTime/followedOnly
+- GET /api/hot-search/latest：查某来源最新批次热搜
+- GET /api/hot-search/{id}：按 ID 取单条详情
+- POST /api/hot-search/import：写入抓取结果
+- 关注主题接口：list/search/create/update/delete
+
+四、旧页面实现问题与历史包袱
+1. 页面状态耦合偏重
+- 列表筛选、分页、详情选中、主题管理都堆在单页面 useState/useEffect 中，后续扩展来源、时间区间、更多筛选条件时会继续变重
+
+2. 查询状态没有 URL 化
+- source、keyword、followedOnly、page 都不在 URL 中，刷新或分享后状态丢失，不符合管理后台检索页最佳实践
+
+3. 详情区依赖列表返回完整 detailMarkdown
+- 这让 search 接口承担了列表 + 详情双重负担，随着 detailMarkdown 变长，分页接口会变重
+
+4. UI 方案偏“临时可用”
+- 旧实现是左表右详情 + 抽屉主题管理，能用，但信息密度和移动端体验一般
+- 主题管理和浏览上下文耦合较紧，适合在 nquiz 中做成更明确的二级管理入口或侧边 Sheet + 独立表单
+
+5. 来源扩展能力未真正打开
+- 后端 source 是开放字段，但前端 SOURCE_OPTIONS 只有 TOUTIAO，说明产品形态上“多来源扩展”还没真正进入主流程
+
+五、nquiz / Next.js 重构建议
+1. 页面定位
+建议仍保留一个菜单级页面，路由建议统一为：
+- /hot-search 或 /dashboard/hot-search（二选一，取决于后续管理后台布局）
+页面标题可以对外显示“热搜页”，菜单文案保留“热搜展示”，兼容原有认知。
+
+2. 信息架构
+建议拆为三个层次：
+- 顶部筛选区：来源、标题关键词、是否只看关注、可预留时间范围
+- 主内容区：热搜列表
+- 辅助内容区：详情抽屉/侧栏 + 关注主题管理入口
+
+推荐首期布局：
+- 桌面端：左侧列表，右侧详情面板
+- 移动端：列表全宽，点击条目后使用 Drawer/Sheet 展示详情
+- 关注主题管理：使用独立 Sheet 或二级页面，不建议和详情区共用视觉层级
+
+3. 组件拆分建议
+建议至少拆成：
+- app/.../hot-search/page.tsx：页面壳与 searchParams 解析
+- features/hot-search/components/hot-search-filters.tsx：筛选表单
+- features/hot-search/components/hot-search-table.tsx：列表
+- features/hot-search/components/hot-search-detail.tsx：详情
+- features/hot-search/components/follow-topic-sheet.tsx：主题管理容器
+- features/hot-search/components/follow-topic-form.tsx：新增/编辑表单
+- features/hot-search/api/*.ts：请求封装
+- features/hot-search/hooks/*.ts：TanStack Query hooks
+- features/hot-search/schemas/*.ts：Zod schema
+
+4. 数据流与状态管理建议
+- 列表、详情、主题列表全部走 TanStack Query
+- 筛选条件与分页放到 URL searchParams，保证刷新可恢复、链接可分享
+- 主题增删改走 mutation，成功后精准失效 topics + hot-search-list
+- 当前选中项建议由 URL 中的 id 或客户端局部状态控制；若详情改成单独接口，可用 selectedId 拉详情
+
+5. API 设计建议
+首期建议保留旧语义，但做两点调整：
+- 列表接口返回摘要化字段，不强制每条都返回完整 detailMarkdown
+- 详情独立走 /hot-search/{id}，避免分页列表负载过大
+
+如果 nquiz 需要新建后端表，按项目约定建议使用 quiz_ 前缀：
+- quiz_hot_search_record
+- quiz_hot_search_follow_topic
+以免和 quiz 旧库/旧表撞名。
+
+6. 表单与校验建议
+- 关注主题表单使用 React Hook Form + Zod
+- topicName 必填，最大长度建议沿用 128
+- keywords 允许 textarea 输入，前端提交前做 trim + 去重；后端仍需做最终去重与规范化
+- seq 非负整数
+- enabled 默认 true
+
+7. 视觉设计方向
+- 从“业务工具页”出发，不追求媒体化炫技
+- 列表突出：排名、标题、来源、热度、命中主题、抓取时间
+- 详情区突出：标题、主题命中、来源元数据、原文链接、markdown 内容
+- 样式统一用 Tailwind，基础交互控件优先 Shadcn UI，图标用 Lucide React
+- 命中主题标签建议颜色统一，不要沿用过多 Arco 色彩语义
+
+六、建议保留 / 优化 / 延后的能力范围
+1. 必须保留
+- 热搜列表浏览
+- 标题关键词筛选
+- 只看关注主题
+- 热搜详情查看
+- 关注主题新增/编辑/删除/启停/排序
+- 按用户隔离主题配置
+- 标题关键词命中主题并展示标签
+
+2. 建议优化
+- 将筛选条件 URL 化
+- 将详情从列表接口中拆出来
+- 将主题管理从“临时弹层”升级为结构化管理面板
+- 预留 fromTime/toTime 筛选入口，因为后端原本已支持
+- 统一服务端/客户端类型与校验，避免旧版 DTO 直接裸传
+
+3. 可以延后
+- 多来源支持（当前真实产品只有 TOUTIAO 在用）
+- 站内采集任务面板或采集配置面板
+- latest 批次专属视图
+- extraJson 的可视化展开
+- 热搜趋势分析、收藏、导出等衍生功能
+
+七、风险点
+1. 当前 nquiz 缺少后台基础设施
+- 菜单、权限、登录态、API 基建都还没搭起来，热搜页分析虽然明确，但实际开发前需要先确认它挂在哪个管理后台骨架里
+
+2. 列表/详情接口边界需要尽早定
+- 若仍让 search 直接返回 detailMarkdown，后续数据量上来会影响首屏与分页性能
+
+3. 用户隔离语义必须保留
+- 关注主题是 createUser 维度隔离，若 nquiz 首期为了省事做成全局主题库，会改变原业务语义
+
+4. 数据来源链路未必同步迁移
+- 旧系统已经偏向“外部导入”，nquiz 如果先上页面但没有导入数据，页面只能空跑；需要同步明确测试数据导入方式
+
+5. 表命名与旧系统兼容
+- nquiz 约定新增表要带 quiz_ 前缀，迁移时不能直接照抄旧表名
+
+八、未决问题
+1. nquiz 首期是否需要真正接入后端与数据库，还是先用 mock / BFF 过渡？
+2. 菜单路由最终是放在 /dashboard/hot-search 还是更平铺的 /hot-search？
+3. 详情是否必须展示完整 markdown，还是首期只展示摘要 + 原文链接即可？
+4. 是否需要在首期就开放时间范围筛选？从旧后端能力看建议预留。
+5. 热搜导入链路由谁负责：沿用旧接口思路、单独脚本导入，还是接第三方服务？
+
+九、建议验收标准
+1. 页面可进入热搜菜单并正常展示分页列表
+2. 可按来源、标题关键词、只看关注主题进行查询
+3. 点击列表项可查看详情，包含标题、来源、热度、抓取时间、原文链接、主题命中、markdown/详情内容
+4. 可新增、编辑、删除关注主题，并支持启停与排序
+5. 主题命中规则与旧系统一致：按标题 contains 关键词，大小写不敏感，关键词支持逗号/换行拆分，keywords 为空时回退 topicName
+6. 关注主题按当前用户隔离，不串数据
+7. 页面刷新后筛选条件与分页可恢复（若采用 URL 化方案）
+8. 移动端至少能完成“浏览列表 + 打开详情 + 管理主题”的基本闭环
+
+十、迁移结论
+- 保留的能力：热搜浏览、主题命中、个人关注主题管理、详情查看
+- 优化的能力：页面结构、状态管理、URL 化查询、详情加载方式、表单校验与组件化拆分
+- 可重组的能力：将主题管理从页面内联弹层升级为独立管理面板/二级管理流
+- 可延后的能力：多来源、采集调度面板、趋势分析、导出、extraJson 深度展示
+
+整体建议：把该需求作为 nquiz 管理后台中的一个标准“列表 + 详情 + 个人规则管理”模块来建设，业务语义保留旧 quiz，但实现方式全面切换到 Next.js 重构版最佳实践，不做 Arco 页面原样搬运。

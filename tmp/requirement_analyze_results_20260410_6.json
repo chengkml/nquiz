@@ -1,0 +1,236 @@
+[
+  {
+    "requirementId": "294962874827149303",
+    "title": "[nquiz迁移] OCR 页",
+    "returncode": 0,
+    "stdout": {
+      "ok": true,
+      "action": "analyze",
+      "requirementId": "294962874827149303",
+      "writebackSuccess": true,
+      "statusAfterWriteback": "PENDING_REVIEW",
+      "status": 200,
+      "payload": {
+        "descr": "结论：该页面在 quiz 中本质上是“基于视觉模型的单图 OCR 工作台”，核心不是传统本地 OCR 引擎，而是“图片上传 + 视觉模型选择 + SSE 流式识别结果展示”。迁移到 nquiz 时应保留单图识别、模型切换、图片预览、流式输出、复制结果这条主链路；不必照搬旧页面的 Arco 布局与实现细节。建议按 Next.js App Router 的工具页重构为更清晰的左右分栏工作台，并把批量 OCR 能力降为二期或管理能力。\n\n一、代码定位与当前实现\n1. 旧前端主页面：`/root/.openclaw/workspace/quiz/frontend/src/pages/Ocr/index.tsx`\n2. 旧后端入口：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/ocr/controller/OcrController.java`\n3. 旧后端核心：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/ocr/service/impl/OcrServiceImpl.java`\n4. nquiz 当前骨架：`src/app/layout.tsx`、`src/components/providers/app-providers.tsx`、`src/components/providers/query-provider.tsx`、`src/lib/query/query-keys.ts`\n\n二、旧系统真实功能与业务语义\n1. 页面加载时通过 `getLLMModelsByType('VISION')` 拉取视觉模型，并默认选中默认模型。\n2. 前端只支持单张图片上传，校验格式（jpeg/png/gif/bmp/webp）和 10MB 大小。\n3. 上传后直接调用 `/api/ocr/recognize`，请求头要求 `Accept: text/event-stream`，前端按 SSE 分片逐步累积文本。\n4. 服务端 `OcrServiceImpl` 并非纯本地 OCR，而是读取提示词模板 `ocrRecognize`，并调用视觉大模型流式输出识别内容。\n5. 页面提供图片预览、识别中状态、错误详情、复制结果、清空重试等基础操作。\n6. 后端另有 `/api/ocr/batch-recognize` 批量识别接口，但旧页面并未真正形成成熟批量工作台，因此它不是本页面 MVP 必须项。\n\n三、nquiz 迁移建议（Next.js 语境）\n1. 路由建议：使用 App Router，页面可落在 `app/(dashboard)/tools/ocr/page.tsx`；如需兼容旧链接，可额外保留 `/frame/ocr` 到新地址的 redirect。\n2. 信息架构建议：左侧为上传区（拖拽/点击上传、模型选择、图片预览、重试），右侧为结果区（流式文本、完成态、错误态、复制/下载）。\n3. 状态管理建议：\n   - 表单输入（模型、文件）用 `React Hook Form + Zod`；\n   - OCR 提交用 mutation；\n   - SSE 流式结果用独立 hook 管理，不要把整套流式逻辑直接堆在页面组件里；\n   - 结果区保留 `idle / uploading / streaming / success / error` 明确状态机。\n4. 样式方向：使用 Tailwind + shadcn/ui，视觉上做成“工具工作台”，突出上传、处理中反馈与结果可读性，不必复刻 Arco 卡片样式。\n5. 能力边界建议：\n   - 必保留：单图识别、模型切换、图片预览、流式输出、复制结果、错误提示；\n   - 优化保留：结果下载为 txt/md、重新识别、最近一次识别结果缓存；\n   - 可延后：批量 OCR、模板管理、结构化字段抽取、多结果历史。\n\n四、风险点与未决问题\n1. 当前识别强依赖“默认视觉模型 + `ocrRecognize` 提示词模板”，若 nquiz 未同步模型/模板管理能力，页面会空跑。\n2. SSE 在 Next.js 代理链路里要重点验证，避免被缓冲导致“伪流式”。\n3. 大图上传和长文本输出可能引起浏览器卡顿，前端要限制文件大小并避免频繁整段重渲染。\n4. 旧实现将结果视为纯文本；如果后续希望输出结构化 JSON，需要先明确提示词和数据契约。\n\n五、建议验收标准\n1. 用户可以选择视觉模型并上传单张图片完成识别。\n2. 识别结果能以流式方式逐步呈现，错误可见且可重试。\n3. 可复制最终文本，并能清空当前任务重新开始。\n4. 模型未配置、模板缺失、上传非法文件、服务端失败四类异常都有明确提示。\n5. 页面实现符合 nquiz 技术基线（Next.js App Router + Tailwind + shadcn + RHF/Zod + TanStack Query/自定义流式 hook）。"
+      },
+      "result": {
+        "id": "294962874827149303",
+        "createDate": "2026-04-10T20:38:52.382486",
+        "createUser": "openclaw",
+        "createUserName": "小龙虾",
+        "updateDate": "2026-04-10T20:38:52.382486",
+        "updateUser": "openclaw",
+        "updateUserName": "小龙虾",
+        "groupName": null,
+        "groupLabel": null,
+        "tagNames": null,
+        "tagLabels": null,
+        "title": "[nquiz迁移] OCR 页",
+        "projectName": "nquiz",
+        "gitUrl": "https://github.com/chengkml/nquiz.git",
+        "branch": "main",
+        "descr": "结论：该页面在 quiz 中本质上是“基于视觉模型的单图 OCR 工作台”，核心不是传统本地 OCR 引擎，而是“图片上传 + 视觉模型选择 + SSE 流式识别结果展示”。迁移到 nquiz 时应保留单图识别、模型切换、图片预览、流式输出、复制结果这条主链路；不必照搬旧页面的 Arco 布局与实现细节。建议按 Next.js App Router 的工具页重构为更清晰的左右分栏工作台，并把批量 OCR 能力降为二期或管理能力。\n\n一、代码定位与当前实现\n1. 旧前端主页面：`/root/.openclaw/workspace/quiz/frontend/src/pages/Ocr/index.tsx`\n2. 旧后端入口：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/ocr/controller/OcrController.java`\n3. 旧后端核心：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/ocr/service/impl/OcrServiceImpl.java`\n4. nquiz 当前骨架：`src/app/layout.tsx`、`src/components/providers/app-providers.tsx`、`src/components/providers/query-provider.tsx`、`src/lib/query/query-keys.ts`\n\n二、旧系统真实功能与业务语义\n1. 页面加载时通过 `getLLMModelsByType('VISION')` 拉取视觉模型，并默认选中默认模型。\n2. 前端只支持单张图片上传，校验格式（jpeg/png/gif/bmp/webp）和 10MB 大小。\n3. 上传后直接调用 `/api/ocr/recognize`，请求头要求 `Accept: text/event-stream`，前端按 SSE 分片逐步累积文本。\n4. 服务端 `OcrServiceImpl` 并非纯本地 OCR，而是读取提示词模板 `ocrRecognize`，并调用视觉大模型流式输出识别内容。\n5. 页面提供图片预览、识别中状态、错误详情、复制结果、清空重试等基础操作。\n6. 后端另有 `/api/ocr/batch-recognize` 批量识别接口，但旧页面并未真正形成成熟批量工作台，因此它不是本页面 MVP 必须项。\n\n三、nquiz 迁移建议（Next.js 语境）\n1. 路由建议：使用 App Router，页面可落在 `app/(dashboard)/tools/ocr/page.tsx`；如需兼容旧链接，可额外保留 `/frame/ocr` 到新地址的 redirect。\n2. 信息架构建议：左侧为上传区（拖拽/点击上传、模型选择、图片预览、重试），右侧为结果区（流式文本、完成态、错误态、复制/下载）。\n3. 状态管理建议：\n   - 表单输入（模型、文件）用 `React Hook Form + Zod`；\n   - OCR 提交用 mutation；\n   - SSE 流式结果用独立 hook 管理，不要把整套流式逻辑直接堆在页面组件里；\n   - 结果区保留 `idle / uploading / streaming / success / error` 明确状态机。\n4. 样式方向：使用 Tailwind + shadcn/ui，视觉上做成“工具工作台”，突出上传、处理中反馈与结果可读性，不必复刻 Arco 卡片样式。\n5. 能力边界建议：\n   - 必保留：单图识别、模型切换、图片预览、流式输出、复制结果、错误提示；\n   - 优化保留：结果下载为 txt/md、重新识别、最近一次识别结果缓存；\n   - 可延后：批量 OCR、模板管理、结构化字段抽取、多结果历史。\n\n四、风险点与未决问题\n1. 当前识别强依赖“默认视觉模型 + `ocrRecognize` 提示词模板”，若 nquiz 未同步模型/模板管理能力，页面会空跑。\n2. SSE 在 Next.js 代理链路里要重点验证，避免被缓冲导致“伪流式”。\n3. 大图上传和长文本输出可能引起浏览器卡顿，前端要限制文件大小并避免频繁整段重渲染。\n4. 旧实现将结果视为纯文本；如果后续希望输出结构化 JSON，需要先明确提示词和数据契约。\n\n五、建议验收标准\n1. 用户可以选择视觉模型并上传单张图片完成识别。\n2. 识别结果能以流式方式逐步呈现，错误可见且可重试。\n3. 可复制最终文本，并能清空当前任务重新开始。\n4. 模型未配置、模板缺失、上传非法文件、服务端失败四类异常都有明确提示。\n5. 页面实现符合 nquiz 技术基线（Next.js App Router + Tailwind + shadcn + RHF/Zod + TanStack Query/自定义流式 hook）。",
+        "resultMsg": null,
+        "progressPercent": 0,
+        "status": "PENDING_REVIEW",
+        "priority": "MEDIUM"
+      }
+    },
+    "stderr": ""
+  },
+  {
+    "requirementId": "294962874827149306",
+    "title": "[nquiz迁移] MdResolvePage",
+    "returncode": 0,
+    "stdout": {
+      "ok": true,
+      "action": "analyze",
+      "requirementId": "294962874827149306",
+      "writebackSuccess": true,
+      "statusAfterWriteback": "PENDING_REVIEW",
+      "status": 200,
+      "payload": {
+        "descr": "结论：该页面在 quiz 中不是简单的 Markdown 预览，而是“按模板解析 Markdown 内容、输出结构化纠错结果，并继续计算分值/导出 DOCX”的规则化处理工作台。迁移到 nquiz 时应保留“模板驱动解析 + 结果结构化展示 + 评分 + DOCX 导出”主链路，但应重构为更清晰的三段式工作台，而不是继续堆叠为一个大表单页。\n\n一、代码定位与当前实现\n1. 旧前端页面：`/root/.openclaw/workspace/quiz/frontend/src/pages/MdResolve/index.tsx`\n2. 前端接口：`/root/.openclaw/workspace/quiz/frontend/src/services/mdResolveService.ts`\n3. 后端控制器：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/mdresolve/controller/MdResolveController.java`\n4. 后端服务：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/mdresolve/service/MdResolveService.java`\n5. nquiz 当前仅有基础壳：`src/app/layout.tsx`、`src/components/providers/query-provider.tsx` 等，还没有该业务页。\n\n二、旧系统真实功能与链路\n1. 用户输入 Markdown 内容，可选择使用默认模板或手动输入自定义模板。\n2. 前端调用 `/api/md-resolve/parse`，请求体包含 `mdContent` 和可选 `mdTemplate`。\n3. 后端默认模板来自 `templates/md_extract.md`，解析结果是 `Map<String, List<Map<String, Object>>>`，说明它本质上输出的是“按规则块分组的结构化数据”。\n4. 解析成功后，页面可继续调用 `/api/md-resolve/calculate` 进行评分，评分规则由 `templates/score_rules.json` 驱动。\n5. 页面还支持 `/api/md-resolve/export-docx`，服务端会把解析结果按内置标题映射（如 typo/terms/grammar/semantics 等）导出为 DOCX。\n6. 旧页面还提供示例 Markdown、复制 JSON、下载 JSON 等辅助动作。\n\n三、nquiz 迁移建议（最佳实践）\n1. 页面定位：建议在 nquiz 中明确命名为“Markdown 结构化解析工作台”或“Markdown 纠错结果整理页”，避免 `MdResolve` 这种内部实现式命名直接暴露给用户。\n2. 路由建议：可放在 `app/(dashboard)/tools/md-resolve/page.tsx`；若后续和 Markdown 转换能力整合，也可以挂到统一的 `markdown` 工具域下。\n3. 信息架构建议：\n   - Step 1：输入区（Markdown 原文、模板来源切换、默认模板加载、自定义模板编辑）；\n   - Step 2：解析结果区（按类别卡片/表格展示，不建议默认只展示原始 JSON）；\n   - Step 3：输出区（评分结果、DOCX 导出、JSON 导出）。\n4. 数据与状态建议：\n   - 表单用 `React Hook Form + Zod`；\n   - 解析/评分/导出都应建成独立 mutation；\n   - 解析结果在客户端做类型兜底，至少对块名、记录数组、score/grade 做明确 schema 校验。\n5. 视觉与交互建议：使用 Tailwind + shadcn/ui，把“模板”“输入”“结果”“导出”明确分层；默认模板加载、评分完成、导出完成都要有明显反馈。\n\n四、能力保留 / 优化 / 延后\n1. 必保留：默认模板解析、自定义模板解析、结构化结果展示、评分、DOCX 导出。\n2. 建议优化：\n   - 结果展示从原始 JSON 升级为按错误类型分组的可读 UI；\n   - `docName` 不应再写死为“科研智能助手项目建议书”，而应让用户输入或从上下文带入；\n   - 模板切换要支持“查看默认模板但不污染当前编辑内容”。\n3. 可延后：模板历史版本、多人共享模板、可视化规则编辑器。\n\n五、风险点与未决问题\n1. 解析结果高度依赖 `md_extract.md` 模板格式，模板升级后要验证兼容性。\n2. `score_rules.json` 缺失时后端默认不扣分，这会影响评分可信度，需要在页面上明确提示规则状态。\n3. DOCX 导出逻辑目前对块名称有内置映射，若模板块名变化，导出标题可能失真。\n4. 若 nquiz 后续将其用于正式业务流转，需要补齐结果持久化与任务历史，而不是只做一次性工具页。\n\n六、建议验收标准\n1. 能用默认模板或自定义模板解析 Markdown，并得到结构化结果。\n2. 解析结果可以按类别清晰查看，而不是只能看 JSON 原文。\n3. 能计算分值并看到分数/评级。\n4. 能导出 DOCX，导出内容与页面展示一致。\n5. 模板缺失、评分规则缺失、解析失败、导出失败都有明确提示。"
+      },
+      "result": {
+        "id": "294962874827149306",
+        "createDate": "2026-04-10T20:38:52.471118",
+        "createUser": "openclaw",
+        "createUserName": "小龙虾",
+        "updateDate": "2026-04-10T20:38:52.471118",
+        "updateUser": "openclaw",
+        "updateUserName": "小龙虾",
+        "groupName": null,
+        "groupLabel": null,
+        "tagNames": null,
+        "tagLabels": null,
+        "title": "[nquiz迁移] MdResolvePage",
+        "projectName": "nquiz",
+        "gitUrl": "https://github.com/chengkml/nquiz.git",
+        "branch": "main",
+        "descr": "结论：该页面在 quiz 中不是简单的 Markdown 预览，而是“按模板解析 Markdown 内容、输出结构化纠错结果，并继续计算分值/导出 DOCX”的规则化处理工作台。迁移到 nquiz 时应保留“模板驱动解析 + 结果结构化展示 + 评分 + DOCX 导出”主链路，但应重构为更清晰的三段式工作台，而不是继续堆叠为一个大表单页。\n\n一、代码定位与当前实现\n1. 旧前端页面：`/root/.openclaw/workspace/quiz/frontend/src/pages/MdResolve/index.tsx`\n2. 前端接口：`/root/.openclaw/workspace/quiz/frontend/src/services/mdResolveService.ts`\n3. 后端控制器：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/mdresolve/controller/MdResolveController.java`\n4. 后端服务：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/mdresolve/service/MdResolveService.java`\n5. nquiz 当前仅有基础壳：`src/app/layout.tsx`、`src/components/providers/query-provider.tsx` 等，还没有该业务页。\n\n二、旧系统真实功能与链路\n1. 用户输入 Markdown 内容，可选择使用默认模板或手动输入自定义模板。\n2. 前端调用 `/api/md-resolve/parse`，请求体包含 `mdContent` 和可选 `mdTemplate`。\n3. 后端默认模板来自 `templates/md_extract.md`，解析结果是 `Map<String, List<Map<String, Object>>>`，说明它本质上输出的是“按规则块分组的结构化数据”。\n4. 解析成功后，页面可继续调用 `/api/md-resolve/calculate` 进行评分，评分规则由 `templates/score_rules.json` 驱动。\n5. 页面还支持 `/api/md-resolve/export-docx`，服务端会把解析结果按内置标题映射（如 typo/terms/grammar/semantics 等）导出为 DOCX。\n6. 旧页面还提供示例 Markdown、复制 JSON、下载 JSON 等辅助动作。\n\n三、nquiz 迁移建议（最佳实践）\n1. 页面定位：建议在 nquiz 中明确命名为“Markdown 结构化解析工作台”或“Markdown 纠错结果整理页”，避免 `MdResolve` 这种内部实现式命名直接暴露给用户。\n2. 路由建议：可放在 `app/(dashboard)/tools/md-resolve/page.tsx`；若后续和 Markdown 转换能力整合，也可以挂到统一的 `markdown` 工具域下。\n3. 信息架构建议：\n   - Step 1：输入区（Markdown 原文、模板来源切换、默认模板加载、自定义模板编辑）；\n   - Step 2：解析结果区（按类别卡片/表格展示，不建议默认只展示原始 JSON）；\n   - Step 3：输出区（评分结果、DOCX 导出、JSON 导出）。\n4. 数据与状态建议：\n   - 表单用 `React Hook Form + Zod`；\n   - 解析/评分/导出都应建成独立 mutation；\n   - 解析结果在客户端做类型兜底，至少对块名、记录数组、score/grade 做明确 schema 校验。\n5. 视觉与交互建议：使用 Tailwind + shadcn/ui，把“模板”“输入”“结果”“导出”明确分层；默认模板加载、评分完成、导出完成都要有明显反馈。\n\n四、能力保留 / 优化 / 延后\n1. 必保留：默认模板解析、自定义模板解析、结构化结果展示、评分、DOCX 导出。\n2. 建议优化：\n   - 结果展示从原始 JSON 升级为按错误类型分组的可读 UI；\n   - `docName` 不应再写死为“科研智能助手项目建议书”，而应让用户输入或从上下文带入；\n   - 模板切换要支持“查看默认模板但不污染当前编辑内容”。\n3. 可延后：模板历史版本、多人共享模板、可视化规则编辑器。\n\n五、风险点与未决问题\n1. 解析结果高度依赖 `md_extract.md` 模板格式，模板升级后要验证兼容性。\n2. `score_rules.json` 缺失时后端默认不扣分，这会影响评分可信度，需要在页面上明确提示规则状态。\n3. DOCX 导出逻辑目前对块名称有内置映射，若模板块名变化，导出标题可能失真。\n4. 若 nquiz 后续将其用于正式业务流转，需要补齐结果持久化与任务历史，而不是只做一次性工具页。\n\n六、建议验收标准\n1. 能用默认模板或自定义模板解析 Markdown，并得到结构化结果。\n2. 解析结果可以按类别清晰查看，而不是只能看 JSON 原文。\n3. 能计算分值并看到分数/评级。\n4. 能导出 DOCX，导出内容与页面展示一致。\n5. 模板缺失、评分规则缺失、解析失败、导出失败都有明确提示。",
+        "resultMsg": null,
+        "progressPercent": 0,
+        "status": "PENDING_REVIEW",
+        "priority": "MEDIUM"
+      }
+    },
+    "stderr": ""
+  },
+  {
+    "requirementId": "294962874827149309",
+    "title": "[nquiz迁移] Markdown 转换页",
+    "returncode": 0,
+    "stdout": {
+      "ok": true,
+      "action": "analyze",
+      "requirementId": "294962874827149309",
+      "writebackSuccess": true,
+      "statusAfterWriteback": "PENDING_REVIEW",
+      "status": 200,
+      "payload": {
+        "descr": "结论：该页面在 quiz 中实际上包含两条能力链路：一条是 Markdown -> HTML/Word/PDF 的导出链路，另一条是“任意文档 -> Markdown”的导入链路。迁移到 nquiz 时不应继续用一个历史命名模糊的 `MdConvert` 页面硬塞所有按钮，而应重构为统一的“Markdown 转换工作台”，把导入与导出分成两个清晰标签页或两个子页面。\n\n一、代码定位与当前实现\n1. 旧前端页面：`/root/.openclaw/workspace/quiz/frontend/src/pages/MdConvert/index.tsx`\n2. 前端接口：`/root/.openclaw/workspace/quiz/frontend/src/services/mdConvertService.ts`\n3. 文档转 Markdown 后端：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/controller/DocumentConversionController.java`\n4. Markdown 导出后端：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/mdconvert/controller/MdConvertController.java`、`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/mdconvert/service/MdConvertService.java`\n5. nquiz 当前没有业务页，只有 Next.js 基础 Provider 与首页骨架。\n\n二、旧系统真实功能与边界\n1. Markdown 导出链路：输入 Markdown，调用 `/md-convert/to-html`、`/md-convert/to-word`、`/md-convert/to-pdf`，并在前端直接触发下载。\n2. 文档导入链路：上传 doc/docx/pdf/xls/xlsx/html/txt/md 等文件，调用 `/api/convert/document` 转成 Markdown。\n3. 文件导入支持较大文件（前端 100MB 限制），后端会先根据 media type 找专用转换器，找不到则降级为 Tika 纯文本提取，并返回 warnings。\n4. 旧页面已具备示例 Markdown、复制 HTML、下载 HTML、展示源文件名和 mediaType 等辅助信息。\n\n三、nquiz 迁移建议（Next.js 最佳实践）\n1. 页面定位：建议明确命名为“Markdown 转换工作台”，而不是继续暴露 `MdConvert` 这种实现名。\n2. 信息架构：\n   - Tab A：导入到 Markdown（上传文件 -> 转换 -> 查看 Markdown -> 复制/下载）；\n   - Tab B：从 Markdown 导出（编辑 Markdown -> 预览 HTML -> 导出 DOCX/PDF/HTML）。\n3. 路由建议：可用 `app/(dashboard)/tools/markdown/page.tsx`，内部再用 tabs；如果后续功能很多，可拆成 `markdown/import` 与 `markdown/export`。\n4. 数据与交互建议：\n   - Markdown 文本输入用 RHF + Zod；\n   - 文件上传与转换使用 mutation；\n   - 下载类操作统一封装为客户端 utility，避免页面里重复写 Blob 下载逻辑；\n   - 对 warnings、mediaType、降级提取结果做明确展示，不要藏在接口返回里。\n5. 视觉方向：使用 Tailwind + shadcn/ui，输入区、预览区、下载区分层明显；对于 HTML 结果建议同时支持“源码查看”和“渲染预览”。\n\n四、能力保留 / 优化 / 延后\n1. 必保留：\n   - Markdown -> HTML\n   - Markdown -> Word(DOCX)\n   - Markdown -> PDF\n   - 文档 -> Markdown\n2. 建议优化：\n   - 统一文件名输入逻辑，Word/PDF/HTML 不要各自散落处理；\n   - 文档转 Markdown 后的 warnings 必须直观可见；\n   - HTML 结果应支持源码与预览双视图。\n3. 可延后：批量文件转换、转换历史、模板化导出样式、知识库直入能力。\n\n五、风险点与未决问题\n1. 不同文件格式的结构化保真度差异很大，特别是 xls/xlsx/html 等边界格式，必须允许“降级为纯文本”的现实。\n2. 大文件上传与浏览器内存占用要重点控制，尤其是长 Markdown 预览。\n3. 若 nquiz 后续使用 Next.js Route Handler 做转发，要验证二进制下载与 multipart 上传是否稳定。\n4. 当前导出和导入是两个后端域（`/md-convert/*` 与 `/convert/document`），前端层需要做统一抽象，避免未来继续耦合。\n\n六、建议验收标准\n1. 用户能在同一工作台完成“导入到 Markdown”和“从 Markdown 导出”两类操作。\n2. 转换成功时可复制/下载结果，失败时能看到明确错误。\n3. 文档转换 warnings、源文件名、媒体类型可见。\n4. 导出文件名可控，DOCX/PDF/HTML 下载正确。\n5. 页面实现符合 nquiz 技术基线，且导入/导出逻辑已经从页面中抽离为可复用 hooks/services。"
+      },
+      "result": {
+        "id": "294962874827149309",
+        "createDate": "2026-04-10T20:38:52.555554",
+        "createUser": "openclaw",
+        "createUserName": "小龙虾",
+        "updateDate": "2026-04-10T20:38:52.555554",
+        "updateUser": "openclaw",
+        "updateUserName": "小龙虾",
+        "groupName": null,
+        "groupLabel": null,
+        "tagNames": null,
+        "tagLabels": null,
+        "title": "[nquiz迁移] Markdown 转换页",
+        "projectName": "nquiz",
+        "gitUrl": "https://github.com/chengkml/nquiz.git",
+        "branch": "main",
+        "descr": "结论：该页面在 quiz 中实际上包含两条能力链路：一条是 Markdown -> HTML/Word/PDF 的导出链路，另一条是“任意文档 -> Markdown”的导入链路。迁移到 nquiz 时不应继续用一个历史命名模糊的 `MdConvert` 页面硬塞所有按钮，而应重构为统一的“Markdown 转换工作台”，把导入与导出分成两个清晰标签页或两个子页面。\n\n一、代码定位与当前实现\n1. 旧前端页面：`/root/.openclaw/workspace/quiz/frontend/src/pages/MdConvert/index.tsx`\n2. 前端接口：`/root/.openclaw/workspace/quiz/frontend/src/services/mdConvertService.ts`\n3. 文档转 Markdown 后端：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/controller/DocumentConversionController.java`\n4. Markdown 导出后端：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/mdconvert/controller/MdConvertController.java`、`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/mdconvert/service/MdConvertService.java`\n5. nquiz 当前没有业务页，只有 Next.js 基础 Provider 与首页骨架。\n\n二、旧系统真实功能与边界\n1. Markdown 导出链路：输入 Markdown，调用 `/md-convert/to-html`、`/md-convert/to-word`、`/md-convert/to-pdf`，并在前端直接触发下载。\n2. 文档导入链路：上传 doc/docx/pdf/xls/xlsx/html/txt/md 等文件，调用 `/api/convert/document` 转成 Markdown。\n3. 文件导入支持较大文件（前端 100MB 限制），后端会先根据 media type 找专用转换器，找不到则降级为 Tika 纯文本提取，并返回 warnings。\n4. 旧页面已具备示例 Markdown、复制 HTML、下载 HTML、展示源文件名和 mediaType 等辅助信息。\n\n三、nquiz 迁移建议（Next.js 最佳实践）\n1. 页面定位：建议明确命名为“Markdown 转换工作台”，而不是继续暴露 `MdConvert` 这种实现名。\n2. 信息架构：\n   - Tab A：导入到 Markdown（上传文件 -> 转换 -> 查看 Markdown -> 复制/下载）；\n   - Tab B：从 Markdown 导出（编辑 Markdown -> 预览 HTML -> 导出 DOCX/PDF/HTML）。\n3. 路由建议：可用 `app/(dashboard)/tools/markdown/page.tsx`，内部再用 tabs；如果后续功能很多，可拆成 `markdown/import` 与 `markdown/export`。\n4. 数据与交互建议：\n   - Markdown 文本输入用 RHF + Zod；\n   - 文件上传与转换使用 mutation；\n   - 下载类操作统一封装为客户端 utility，避免页面里重复写 Blob 下载逻辑；\n   - 对 warnings、mediaType、降级提取结果做明确展示，不要藏在接口返回里。\n5. 视觉方向：使用 Tailwind + shadcn/ui，输入区、预览区、下载区分层明显；对于 HTML 结果建议同时支持“源码查看”和“渲染预览”。\n\n四、能力保留 / 优化 / 延后\n1. 必保留：\n   - Markdown -> HTML\n   - Markdown -> Word(DOCX)\n   - Markdown -> PDF\n   - 文档 -> Markdown\n2. 建议优化：\n   - 统一文件名输入逻辑，Word/PDF/HTML 不要各自散落处理；\n   - 文档转 Markdown 后的 warnings 必须直观可见；\n   - HTML 结果应支持源码与预览双视图。\n3. 可延后：批量文件转换、转换历史、模板化导出样式、知识库直入能力。\n\n五、风险点与未决问题\n1. 不同文件格式的结构化保真度差异很大，特别是 xls/xlsx/html 等边界格式，必须允许“降级为纯文本”的现实。\n2. 大文件上传与浏览器内存占用要重点控制，尤其是长 Markdown 预览。\n3. 若 nquiz 后续使用 Next.js Route Handler 做转发，要验证二进制下载与 multipart 上传是否稳定。\n4. 当前导出和导入是两个后端域（`/md-convert/*` 与 `/convert/document`），前端层需要做统一抽象，避免未来继续耦合。\n\n六、建议验收标准\n1. 用户能在同一工作台完成“导入到 Markdown”和“从 Markdown 导出”两类操作。\n2. 转换成功时可复制/下载结果，失败时能看到明确错误。\n3. 文档转换 warnings、源文件名、媒体类型可见。\n4. 导出文件名可控，DOCX/PDF/HTML 下载正确。\n5. 页面实现符合 nquiz 技术基线，且导入/导出逻辑已经从页面中抽离为可复用 hooks/services。",
+        "resultMsg": null,
+        "progressPercent": 0,
+        "status": "PENDING_REVIEW",
+        "priority": "MEDIUM"
+      }
+    },
+    "stderr": ""
+  },
+  {
+    "requirementId": "294962874827149312",
+    "title": "[nquiz迁移] 密码/密钥管理页",
+    "returncode": 0,
+    "stdout": {
+      "ok": true,
+      "action": "analyze",
+      "requirementId": "294962874827149312",
+      "writebackSuccess": true,
+      "statusAfterWriteback": "PENDING_REVIEW",
+      "status": 200,
+      "payload": {
+        "descr": "结论：该页面在 quiz 中是“个人密码条目管理 + 邮箱验证码二次校验后查看明文”的轻量密钥本，而不是团队级 Secrets 平台。迁移到 nquiz 时应保留个人密码条目 CRUD、搜索、查看前二次验证这条主链路；但在设计上必须显著提升安全表达、审计意识与误操作控制，不能只把旧页面原样搬到 Next.js。\n\n一、代码定位与当前实现\n1. 旧前端页面：`/root/.openclaw/workspace/quiz/frontend/src/pages/PasswordManager/index.tsx`\n2. 前端接口：`/root/.openclaw/workspace/quiz/frontend/src/pages/PasswordManager/api.ts`\n3. 后端控制器：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/password/controller/PasswordController.java`\n4. 后端服务：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/password/service/PasswordService.java`\n5. nquiz 当前没有鉴权业务页实现，只有基础 QueryProvider 与少量 schema 示例。\n\n二、旧系统真实功能与业务语义\n1. 页面支持搜索、分页、创建、编辑、删除密码条目，字段包括标题、用户名、密码、网址、备注等。\n2. 列表里默认只显示 `******`，点击查看时会弹出验证码验证框。\n3. 用户先调用 `/api/password/send-salt` 向绑定邮箱发送 6 位验证码，再调用 `/api/password/decrypt/{id}?salt=...` 获取明文密码。\n4. 后端搜索按 `createUser` 过滤，说明其业务语义是“个人密码本”，不是共享密码池。\n5. 服务端把验证码存放在 `ConcurrentHashMap` 中，5 分钟过期；查看成功后立即移除验证码。\n6. 密码存储的是 `encryptedPassword`，创建/更新时加密，查看时解密并在旧密文格式下自动升级。\n\n三、nquiz 迁移建议（Next.js 语境）\n1. 页面定位：建议命名为“个人密钥库”或“密码保险箱”，放到受保护的安全分组路由，如 `app/(authenticated)/security/passwords/page.tsx`。\n2. 信息架构建议：\n   - 列表页：搜索、分页、最近更新时间、基础信息、风险提示；\n   - 编辑层：新增/编辑使用 Drawer/Dialog + RHF/Zod；\n   - 查看层：单独的“验证后显示”流程，不在普通编辑弹窗里混杂。\n3. 交互建议：\n   - 查看密码前明确说明“将触发邮箱验证码校验”；\n   - 明文展示应是一次性、短时、可复制但不建议长期停留；\n   - 删除、展示、复制属于高敏动作，需要更明显确认反馈。\n4. 数据与状态建议：\n   - 列表查询走 TanStack Query；\n   - 创建/更新/删除/发送验证码/查看明文都用独立 mutation；\n   - 敏感数据不要进入长期缓存；明文密码不要写入 query cache。\n\n四、能力保留 / 优化 / 延后\n1. 必保留：个人范围的条目搜索、CRUD、邮箱验证码校验后查看明文。\n2. 建议优化：\n   - 安全视觉表达更强，区分普通表单操作与敏感查看操作；\n   - 增加最近查看时间、最近验证时间、操作日志（至少后端留痕）；\n   - 对 URL、备注、用户名等信息做更清晰的信息卡片化展示。\n3. 可延后：标签/分类、共享密钥、附件、团队协作、浏览器自动填充集成。\n\n五、风险点与未决问题\n1. 旧实现验证码仅存在内存，服务重启会失效，也没有明显的发送频控/尝试次数限制；nquiz 若正式使用，需要把这部分安全策略补强。\n2. 密码展示一旦返回前端，本质上就进入了客户端可信边界外，需要明确产品上“展示即风险”的安全提示。\n3. 需要确认 nquiz 的统一鉴权与邮箱通知能力是否已具备，否则该页无法形成闭环。\n4. 若后续需要团队共享，数据模型必须重新设计，不能直接在个人密码本上加字段硬扩。\n\n六、建议验收标准\n1. 用户仅能看到自己的密码条目。\n2. 新增、编辑、删除、搜索、分页正常可用。\n3. 查看明文必须先发送验证码并完成校验，失败与过期提示明确。\n4. 明文密码不会进入列表缓存，不会被普通查询接口直接返回。\n5. 页面实现符合 nquiz 技术基线，且高敏动作的交互反馈明显优于旧版。"
+      },
+      "result": {
+        "id": "294962874827149312",
+        "createDate": "2026-04-10T20:38:52.651776",
+        "createUser": "openclaw",
+        "createUserName": "小龙虾",
+        "updateDate": "2026-04-10T20:38:52.651776",
+        "updateUser": "openclaw",
+        "updateUserName": "小龙虾",
+        "groupName": null,
+        "groupLabel": null,
+        "tagNames": null,
+        "tagLabels": null,
+        "title": "[nquiz迁移] 密码/密钥管理页",
+        "projectName": "nquiz",
+        "gitUrl": "https://github.com/chengkml/nquiz.git",
+        "branch": "main",
+        "descr": "结论：该页面在 quiz 中是“个人密码条目管理 + 邮箱验证码二次校验后查看明文”的轻量密钥本，而不是团队级 Secrets 平台。迁移到 nquiz 时应保留个人密码条目 CRUD、搜索、查看前二次验证这条主链路；但在设计上必须显著提升安全表达、审计意识与误操作控制，不能只把旧页面原样搬到 Next.js。\n\n一、代码定位与当前实现\n1. 旧前端页面：`/root/.openclaw/workspace/quiz/frontend/src/pages/PasswordManager/index.tsx`\n2. 前端接口：`/root/.openclaw/workspace/quiz/frontend/src/pages/PasswordManager/api.ts`\n3. 后端控制器：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/password/controller/PasswordController.java`\n4. 后端服务：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/password/service/PasswordService.java`\n5. nquiz 当前没有鉴权业务页实现，只有基础 QueryProvider 与少量 schema 示例。\n\n二、旧系统真实功能与业务语义\n1. 页面支持搜索、分页、创建、编辑、删除密码条目，字段包括标题、用户名、密码、网址、备注等。\n2. 列表里默认只显示 `******`，点击查看时会弹出验证码验证框。\n3. 用户先调用 `/api/password/send-salt` 向绑定邮箱发送 6 位验证码，再调用 `/api/password/decrypt/{id}?salt=...` 获取明文密码。\n4. 后端搜索按 `createUser` 过滤，说明其业务语义是“个人密码本”，不是共享密码池。\n5. 服务端把验证码存放在 `ConcurrentHashMap` 中，5 分钟过期；查看成功后立即移除验证码。\n6. 密码存储的是 `encryptedPassword`，创建/更新时加密，查看时解密并在旧密文格式下自动升级。\n\n三、nquiz 迁移建议（Next.js 语境）\n1. 页面定位：建议命名为“个人密钥库”或“密码保险箱”，放到受保护的安全分组路由，如 `app/(authenticated)/security/passwords/page.tsx`。\n2. 信息架构建议：\n   - 列表页：搜索、分页、最近更新时间、基础信息、风险提示；\n   - 编辑层：新增/编辑使用 Drawer/Dialog + RHF/Zod；\n   - 查看层：单独的“验证后显示”流程，不在普通编辑弹窗里混杂。\n3. 交互建议：\n   - 查看密码前明确说明“将触发邮箱验证码校验”；\n   - 明文展示应是一次性、短时、可复制但不建议长期停留；\n   - 删除、展示、复制属于高敏动作，需要更明显确认反馈。\n4. 数据与状态建议：\n   - 列表查询走 TanStack Query；\n   - 创建/更新/删除/发送验证码/查看明文都用独立 mutation；\n   - 敏感数据不要进入长期缓存；明文密码不要写入 query cache。\n\n四、能力保留 / 优化 / 延后\n1. 必保留：个人范围的条目搜索、CRUD、邮箱验证码校验后查看明文。\n2. 建议优化：\n   - 安全视觉表达更强，区分普通表单操作与敏感查看操作；\n   - 增加最近查看时间、最近验证时间、操作日志（至少后端留痕）；\n   - 对 URL、备注、用户名等信息做更清晰的信息卡片化展示。\n3. 可延后：标签/分类、共享密钥、附件、团队协作、浏览器自动填充集成。\n\n五、风险点与未决问题\n1. 旧实现验证码仅存在内存，服务重启会失效，也没有明显的发送频控/尝试次数限制；nquiz 若正式使用，需要把这部分安全策略补强。\n2. 密码展示一旦返回前端，本质上就进入了客户端可信边界外，需要明确产品上“展示即风险”的安全提示。\n3. 需要确认 nquiz 的统一鉴权与邮箱通知能力是否已具备，否则该页无法形成闭环。\n4. 若后续需要团队共享，数据模型必须重新设计，不能直接在个人密码本上加字段硬扩。\n\n六、建议验收标准\n1. 用户仅能看到自己的密码条目。\n2. 新增、编辑、删除、搜索、分页正常可用。\n3. 查看明文必须先发送验证码并完成校验，失败与过期提示明确。\n4. 明文密码不会进入列表缓存，不会被普通查询接口直接返回。\n5. 页面实现符合 nquiz 技术基线，且高敏动作的交互反馈明显优于旧版。",
+        "resultMsg": null,
+        "progressPercent": 0,
+        "status": "PENDING_REVIEW",
+        "priority": "MEDIUM"
+      }
+    },
+    "stderr": ""
+  },
+  {
+    "requirementId": "294962874827149315",
+    "title": "[nquiz迁移] GitDesktopPage",
+    "returncode": 0,
+    "stdout": {
+      "ok": true,
+      "action": "analyze",
+      "requirementId": "294962874827149315",
+      "writebackSuccess": true,
+      "statusAfterWriteback": "PENDING_REVIEW",
+      "status": 200,
+      "payload": {
+        "descr": "结论：该页面在 quiz 中是一个典型“浏览器内 Git 桌面客户端”，覆盖仓库注册、工作区状态、暂存/反暂存、提交、diff、分支切换、同步、历史查看等高风险开发者操作。迁移到 nquiz 时不应把它视作普通业务页面，而应明确为“开发者/管理员专用工具页”。功能上建议保留仓库选择、状态查看、diff、stage/unstage、commit、branch checkout、fetch/pull/push 这些主能力；但高风险操作必须加入更清晰的权限、确认与环境校验。\n\n一、代码定位与当前实现\n1. 旧前端页面：`/root/.openclaw/workspace/quiz/frontend/src/pages/GitDesktop/index.tsx`\n2. 前端 hook：`/root/.openclaw/workspace/quiz/frontend/src/pages/GitDesktop/hooks/useGitOperations.ts`\n3. 前端 API：`/root/.openclaw/workspace/quiz/frontend/src/pages/GitDesktop/api/index.ts`\n4. 后端控制器：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/git/controller/GitController.java`、`GitRepoController.java`\n5. 后端核心：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/git/service/impl/GitServiceImpl.java`\n\n二、旧系统真实功能与链路\n1. 页面左侧是仓库列表，支持仓库注册/编辑；主区展示仓库状态、文件改动、diff、提交面板、分支与同步状态、提交历史。\n2. `useGitOperations` 会在切换仓库后刷新 status/log/branches，并提供 stage、unstage、commit、discard、checkout、push、pull、fetch 等动作。\n3. 后端通过 JGit 实现仓库操作，`GitServiceImpl` 对同一 repoId 的写操作加了 `ReentrantLock`，说明开发者已经意识到并发写风险。\n4. 仓库实体里包含 `localPath`，这意味着该功能直接操作服务端本地仓库路径，本质上属于高权限运维/研发工具。\n5. diff、ahead/behind、branch tracking、commit history 都已经形成基础数据面。\n\n三、nquiz 迁移建议（Next.js 语境）\n1. 路由建议：放到受限开发者区域，如 `app/(dev)/git/page.tsx`，不要挂在普通业务导航里。\n2. 信息架构建议：\n   - 仓库管理（仓库注册、路径校验、默认分支、描述）和仓库工作台（status/diff/commit）分层；\n   - 文件改动区、diff 区、提交区继续保留三栏结构，但要适配 Web 响应式与窄屏折叠；\n   - 同步操作（push/pull/fetch）与破坏性操作（discard）需要显式危险态按钮和二次确认。\n3. 数据与状态建议：\n   - repo list、status、branches、log 用 TanStack Query 分层缓存；\n   - 写操作 mutation 成功后按粒度失效刷新，不建议每次粗暴刷新所有区域；\n   - 长耗时操作要有 loading 锁与失败详情，不要只弹统一“失败”。\n4. 设计原则：这是开发工具，不追求业务化装饰，而追求信息密度、操作可预测性和风险透明。\n\n四、能力保留 / 优化 / 延后\n1. 必保留：仓库列表、状态查看、暂存/取消暂存、diff、commit、分支切换、fetch/pull/push、提交历史。\n2. 建议优化：\n   - 增加环境检测（仓库路径是否可访问、Git 凭证是否可用）；\n   - 增加冲突/失败详情展示，而不是仅显示 action 失败；\n   - repo 设置与工作台解耦，避免所有逻辑都塞进一个页面组件。\n3. 可延后：创建/删除分支、merge、amend commit、复杂冲突解决、文件 blame、stash 管理。\n\n五、风险点与未决问题\n1. 该能力本质上是“远程操作服务端本地 Git 仓库”，权限模型必须极其严格。\n2. `localPath` 带来的路径安全、仓库合法性、凭证托管、安全审计都需要重新审视。\n3. push/pull/fetch 依赖服务端 Git 认证环境，nquiz 部署环境不同会直接影响可用性。\n4. discard、checkout、merge 等操作都可能造成不可逆影响，必须明确限制和提示。\n\n六、建议验收标准\n1. 只有具备权限的开发者可见该页面。\n2. 能完成仓库选择、状态查看、diff、stage/unstage、commit、checkout、fetch/pull/push 的主链路。\n3. 失败时能看到具体原因，危险操作有明确确认。\n4. 页面在切换仓库或执行 mutation 后状态刷新正确，不出现文件区/历史区错位。\n5. 功能分层清晰，不再是旧版那种单页大组件 + 大而全 hook 的结构。"
+      },
+      "result": {
+        "id": "294962874827149315",
+        "createDate": "2026-04-10T20:38:52.772077",
+        "createUser": "openclaw",
+        "createUserName": "小龙虾",
+        "updateDate": "2026-04-10T20:38:52.772077",
+        "updateUser": "openclaw",
+        "updateUserName": "小龙虾",
+        "groupName": null,
+        "groupLabel": null,
+        "tagNames": null,
+        "tagLabels": null,
+        "title": "[nquiz迁移] GitDesktopPage",
+        "projectName": "nquiz",
+        "gitUrl": "https://github.com/chengkml/nquiz.git",
+        "branch": "main",
+        "descr": "结论：该页面在 quiz 中是一个典型“浏览器内 Git 桌面客户端”，覆盖仓库注册、工作区状态、暂存/反暂存、提交、diff、分支切换、同步、历史查看等高风险开发者操作。迁移到 nquiz 时不应把它视作普通业务页面，而应明确为“开发者/管理员专用工具页”。功能上建议保留仓库选择、状态查看、diff、stage/unstage、commit、branch checkout、fetch/pull/push 这些主能力；但高风险操作必须加入更清晰的权限、确认与环境校验。\n\n一、代码定位与当前实现\n1. 旧前端页面：`/root/.openclaw/workspace/quiz/frontend/src/pages/GitDesktop/index.tsx`\n2. 前端 hook：`/root/.openclaw/workspace/quiz/frontend/src/pages/GitDesktop/hooks/useGitOperations.ts`\n3. 前端 API：`/root/.openclaw/workspace/quiz/frontend/src/pages/GitDesktop/api/index.ts`\n4. 后端控制器：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/git/controller/GitController.java`、`GitRepoController.java`\n5. 后端核心：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/git/service/impl/GitServiceImpl.java`\n\n二、旧系统真实功能与链路\n1. 页面左侧是仓库列表，支持仓库注册/编辑；主区展示仓库状态、文件改动、diff、提交面板、分支与同步状态、提交历史。\n2. `useGitOperations` 会在切换仓库后刷新 status/log/branches，并提供 stage、unstage、commit、discard、checkout、push、pull、fetch 等动作。\n3. 后端通过 JGit 实现仓库操作，`GitServiceImpl` 对同一 repoId 的写操作加了 `ReentrantLock`，说明开发者已经意识到并发写风险。\n4. 仓库实体里包含 `localPath`，这意味着该功能直接操作服务端本地仓库路径，本质上属于高权限运维/研发工具。\n5. diff、ahead/behind、branch tracking、commit history 都已经形成基础数据面。\n\n三、nquiz 迁移建议（Next.js 语境）\n1. 路由建议：放到受限开发者区域，如 `app/(dev)/git/page.tsx`，不要挂在普通业务导航里。\n2. 信息架构建议：\n   - 仓库管理（仓库注册、路径校验、默认分支、描述）和仓库工作台（status/diff/commit）分层；\n   - 文件改动区、diff 区、提交区继续保留三栏结构，但要适配 Web 响应式与窄屏折叠；\n   - 同步操作（push/pull/fetch）与破坏性操作（discard）需要显式危险态按钮和二次确认。\n3. 数据与状态建议：\n   - repo list、status、branches、log 用 TanStack Query 分层缓存；\n   - 写操作 mutation 成功后按粒度失效刷新，不建议每次粗暴刷新所有区域；\n   - 长耗时操作要有 loading 锁与失败详情，不要只弹统一“失败”。\n4. 设计原则：这是开发工具，不追求业务化装饰，而追求信息密度、操作可预测性和风险透明。\n\n四、能力保留 / 优化 / 延后\n1. 必保留：仓库列表、状态查看、暂存/取消暂存、diff、commit、分支切换、fetch/pull/push、提交历史。\n2. 建议优化：\n   - 增加环境检测（仓库路径是否可访问、Git 凭证是否可用）；\n   - 增加冲突/失败详情展示，而不是仅显示 action 失败；\n   - repo 设置与工作台解耦，避免所有逻辑都塞进一个页面组件。\n3. 可延后：创建/删除分支、merge、amend commit、复杂冲突解决、文件 blame、stash 管理。\n\n五、风险点与未决问题\n1. 该能力本质上是“远程操作服务端本地 Git 仓库”，权限模型必须极其严格。\n2. `localPath` 带来的路径安全、仓库合法性、凭证托管、安全审计都需要重新审视。\n3. push/pull/fetch 依赖服务端 Git 认证环境，nquiz 部署环境不同会直接影响可用性。\n4. discard、checkout、merge 等操作都可能造成不可逆影响，必须明确限制和提示。\n\n六、建议验收标准\n1. 只有具备权限的开发者可见该页面。\n2. 能完成仓库选择、状态查看、diff、stage/unstage、commit、checkout、fetch/pull/push 的主链路。\n3. 失败时能看到具体原因，危险操作有明确确认。\n4. 页面在切换仓库或执行 mutation 后状态刷新正确，不出现文件区/历史区错位。\n5. 功能分层清晰，不再是旧版那种单页大组件 + 大而全 hook 的结构。",
+        "resultMsg": null,
+        "progressPercent": 0,
+        "status": "PENDING_REVIEW",
+        "priority": "MEDIUM"
+      }
+    },
+    "stderr": ""
+  },
+  {
+    "requirementId": "294962874827149318",
+    "title": "[nquiz迁移] 单词本列表页",
+    "returncode": 0,
+    "stdout": {
+      "ok": true,
+      "action": "analyze",
+      "requirementId": "294962874827149318",
+      "writebackSuccess": true,
+      "statusAfterWriteback": "PENDING_REVIEW",
+      "status": 200,
+      "payload": {
+        "descr": "结论：该页面在 quiz 中不是普通列表页，而是一个包含“单词卡片 CRUD + Markdown 释义 + 间隔重复复习 + 复习历史/统计接口 + AI 释义生成”的轻量学习系统。迁移到 nquiz 时应把它视作一个独立学习模块来重构，至少拆成“卡片列表 / 复习会话 / 统计与历史”三个层次，而不是只迁移一个表格页面。\n\n一、代码定位与当前实现\n1. 旧前端列表页：`/root/.openclaw/workspace/quiz/frontend/src/pages/Vocabulary/index.tsx`\n2. 旧前端复习页：`/root/.openclaw/workspace/quiz/frontend/src/pages/Vocabulary/Review.tsx`\n3. 前端 API：`/root/.openclaw/workspace/quiz/frontend/src/pages/Vocabulary/api/index.ts`\n4. 后端控制器：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/vocabulary/controller/VocabularyCardController.java`\n5. 后端服务：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/vocabulary/service/impl/VocabularyCardServiceImpl.java`\n\n二、旧系统真实功能与业务语义\n1. 列表页支持关键词搜索、归档筛选、创建/编辑/删除、归档/取消归档、重置学习状态、查看详情。\n2. 卡片包含 `word`、`mdDefinition`、`easinessFactor`、`interval`、`repetition`、`nextReviewDate`、`lastScore`、`tags` 等学习状态字段。\n3. 复习页会拉取 `/vocabulary/due-today`，按卡片逐张翻面，用户只需给 0/3/5 三档评分。\n4. 后端 `review()` 使用 SM-2 思路计算新的 `easinessFactor / interval / repetition / nextReviewDate`，并写入 `ReviewLog`。\n5. 还存在统计、复习历史、SSE 生成单词释义等接口，说明它不是单纯词条增删改查。\n\n三、从真实代码看到的历史包袱\n1. `search(String userId, VocabularyCardQueryDto queryDto)` 中并没有按 `userId` 加过滤条件，当前实现存在用户隔离风险。\n2. `create()` 时按 `findByWord(createDto.getWord())` 做全局查重，也更像单租户实现，不适合直接迁到 nquiz。\n3. 复习前端只有 0/3/5 三档快捷评分，属于产品交互简化，不代表底层模型只能支持三档。\n\n四、nquiz 迁移建议（Next.js 最佳实践）\n1. 模块定位：建议作为独立学习域，如 `app/(dashboard)/learning/vocabulary/...`，至少拆出列表页和复习页。\n2. 信息架构建议：\n   - 列表页：卡片管理、筛选、归档、重置、详情；\n   - 复习页：沉浸式卡片会话，突出翻面与评分；\n   - 统计/历史页：今日待复习数、复习分布、历史记录。\n3. 技术建议：\n   - 表单用 RHF + Zod；\n   - 列表、详情、dueToday、statistics、history 全部走 TanStack Query；\n   - review/archive/reset/create/update/delete 使用 mutation；\n   - Markdown 释义继续保留，但渲染与输入边界要明确。\n4. 视觉与交互建议：\n   - 列表页强调学习状态（待复习、熟练度、下次复习时间）；\n   - 复习页采用更聚焦的卡片式 UI，支持键盘快捷评分；\n   - 可保留 0/3/5 快捷评分，同时为后续扩展 0-5 评分留出能力。\n\n五、能力保留 / 优化 / 延后\n1. 必保留：单词卡 CRUD、Markdown 释义、归档/重置、今日待复习、SM-2 复习链路、复习历史。\n2. 建议优化：\n   - 用户隔离必须补齐，查重也应调整为用户维度；\n   - 列表、复习、统计分层，不再把所有能力混在一个页面；\n   - AI 释义生成应作为增强能力接入，而不是卡片创建的唯一入口。\n3. 可延后：更复杂的标签体系、学习计划、导入导出、语音发音、跨端同步优化。\n\n六、风险点与未决问题\n1. 如果直接迁移旧数据模型而不修正用户隔离，会把历史单租户问题带入 nquiz。\n2. 复习算法已经隐含历史学习数据，迁移时需要确认旧数据字段是否完整可继承。\n3. Markdown 释义若允许 AI 自动生成，需要确认模型配置、成本与内容质量边界。\n\n七、建议验收标准\n1. 能完成卡片新增、编辑、删除、归档、重置与详情查看。\n2. 今日待复习清单与复习会话可正常工作，评分后学习状态会更新。\n3. 复习历史和基础统计可查看。\n4. 用户只能看到自己的数据，查重不再是全局级别。\n5. 页面结构符合 nquiz 语境：列表、复习、统计分层明确，视觉与交互明显优于旧版。"
+      },
+      "result": {
+        "id": "294962874827149318",
+        "createDate": "2026-04-10T20:38:52.864552",
+        "createUser": "openclaw",
+        "createUserName": "小龙虾",
+        "updateDate": "2026-04-10T20:38:52.864552",
+        "updateUser": "openclaw",
+        "updateUserName": "小龙虾",
+        "groupName": null,
+        "groupLabel": null,
+        "tagNames": null,
+        "tagLabels": null,
+        "title": "[nquiz迁移] 单词本列表页",
+        "projectName": "nquiz",
+        "gitUrl": "https://github.com/chengkml/nquiz.git",
+        "branch": "main",
+        "descr": "结论：该页面在 quiz 中不是普通列表页，而是一个包含“单词卡片 CRUD + Markdown 释义 + 间隔重复复习 + 复习历史/统计接口 + AI 释义生成”的轻量学习系统。迁移到 nquiz 时应把它视作一个独立学习模块来重构，至少拆成“卡片列表 / 复习会话 / 统计与历史”三个层次，而不是只迁移一个表格页面。\n\n一、代码定位与当前实现\n1. 旧前端列表页：`/root/.openclaw/workspace/quiz/frontend/src/pages/Vocabulary/index.tsx`\n2. 旧前端复习页：`/root/.openclaw/workspace/quiz/frontend/src/pages/Vocabulary/Review.tsx`\n3. 前端 API：`/root/.openclaw/workspace/quiz/frontend/src/pages/Vocabulary/api/index.ts`\n4. 后端控制器：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/vocabulary/controller/VocabularyCardController.java`\n5. 后端服务：`/root/.openclaw/workspace/quiz/backend/src/main/java/com/ck/quiz/vocabulary/service/impl/VocabularyCardServiceImpl.java`\n\n二、旧系统真实功能与业务语义\n1. 列表页支持关键词搜索、归档筛选、创建/编辑/删除、归档/取消归档、重置学习状态、查看详情。\n2. 卡片包含 `word`、`mdDefinition`、`easinessFactor`、`interval`、`repetition`、`nextReviewDate`、`lastScore`、`tags` 等学习状态字段。\n3. 复习页会拉取 `/vocabulary/due-today`，按卡片逐张翻面，用户只需给 0/3/5 三档评分。\n4. 后端 `review()` 使用 SM-2 思路计算新的 `easinessFactor / interval / repetition / nextReviewDate`，并写入 `ReviewLog`。\n5. 还存在统计、复习历史、SSE 生成单词释义等接口，说明它不是单纯词条增删改查。\n\n三、从真实代码看到的历史包袱\n1. `search(String userId, VocabularyCardQueryDto queryDto)` 中并没有按 `userId` 加过滤条件，当前实现存在用户隔离风险。\n2. `create()` 时按 `findByWord(createDto.getWord())` 做全局查重，也更像单租户实现，不适合直接迁到 nquiz。\n3. 复习前端只有 0/3/5 三档快捷评分，属于产品交互简化，不代表底层模型只能支持三档。\n\n四、nquiz 迁移建议（Next.js 最佳实践）\n1. 模块定位：建议作为独立学习域，如 `app/(dashboard)/learning/vocabulary/...`，至少拆出列表页和复习页。\n2. 信息架构建议：\n   - 列表页：卡片管理、筛选、归档、重置、详情；\n   - 复习页：沉浸式卡片会话，突出翻面与评分；\n   - 统计/历史页：今日待复习数、复习分布、历史记录。\n3. 技术建议：\n   - 表单用 RHF + Zod；\n   - 列表、详情、dueToday、statistics、history 全部走 TanStack Query；\n   - review/archive/reset/create/update/delete 使用 mutation；\n   - Markdown 释义继续保留，但渲染与输入边界要明确。\n4. 视觉与交互建议：\n   - 列表页强调学习状态（待复习、熟练度、下次复习时间）；\n   - 复习页采用更聚焦的卡片式 UI，支持键盘快捷评分；\n   - 可保留 0/3/5 快捷评分，同时为后续扩展 0-5 评分留出能力。\n\n五、能力保留 / 优化 / 延后\n1. 必保留：单词卡 CRUD、Markdown 释义、归档/重置、今日待复习、SM-2 复习链路、复习历史。\n2. 建议优化：\n   - 用户隔离必须补齐，查重也应调整为用户维度；\n   - 列表、复习、统计分层，不再把所有能力混在一个页面；\n   - AI 释义生成应作为增强能力接入，而不是卡片创建的唯一入口。\n3. 可延后：更复杂的标签体系、学习计划、导入导出、语音发音、跨端同步优化。\n\n六、风险点与未决问题\n1. 如果直接迁移旧数据模型而不修正用户隔离，会把历史单租户问题带入 nquiz。\n2. 复习算法已经隐含历史学习数据，迁移时需要确认旧数据字段是否完整可继承。\n3. Markdown 释义若允许 AI 自动生成，需要确认模型配置、成本与内容质量边界。\n\n七、建议验收标准\n1. 能完成卡片新增、编辑、删除、归档、重置与详情查看。\n2. 今日待复习清单与复习会话可正常工作，评分后学习状态会更新。\n3. 复习历史和基础统计可查看。\n4. 用户只能看到自己的数据，查重不再是全局级别。\n5. 页面结构符合 nquiz 语境：列表、复习、统计分层明确，视觉与交互明显优于旧版。",
+        "resultMsg": null,
+        "progressPercent": 0,
+        "status": "PENDING_REVIEW",
+        "priority": "MEDIUM"
+      }
+    },
+    "stderr": ""
+  }
+]

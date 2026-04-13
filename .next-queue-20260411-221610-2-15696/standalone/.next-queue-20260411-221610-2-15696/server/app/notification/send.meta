@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/notification/layout,_N_T_/notification/send/layout,_N_T_/notification/send/page,_N_T_/notification/send"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/notification/send/__PAGE__",
+    "/notification/send",
+    "/notification",
+    "/_index",
+    "/_head"
+  ]
+}

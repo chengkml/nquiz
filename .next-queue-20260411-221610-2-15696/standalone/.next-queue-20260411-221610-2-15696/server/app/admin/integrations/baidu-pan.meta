@@ -1,0 +1,17 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/admin/layout,_N_T_/admin/integrations/layout,_N_T_/admin/integrations/baidu-pan/layout,_N_T_/admin/integrations/baidu-pan/page,_N_T_/admin/integrations/baidu-pan"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/admin/integrations/baidu-pan/__PAGE__",
+    "/admin/integrations/baidu-pan",
+    "/admin/integrations",
+    "/admin",
+    "/_index",
+    "/_head"
+  ]
+}

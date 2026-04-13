@@ -1,0 +1,534 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/api/datasources/[id]",
+      "regex": "^/api/datasources/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/datasources/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/datasources/[id]/schema/collect",
+      "regex": "^/api/datasources/([^/]+?)/schema/collect(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/datasources/(?<nxtPid>[^/]+?)/schema/collect(?:/)?$"
+    },
+    {
+      "page": "/api/datasources/[id]/schema/preview",
+      "regex": "^/api/datasources/([^/]+?)/schema/preview(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/datasources/(?<nxtPid>[^/]+?)/schema/preview(?:/)?$"
+    },
+    {
+      "page": "/api/datasources/[id]/schemas",
+      "regex": "^/api/datasources/([^/]+?)/schemas(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/datasources/(?<nxtPid>[^/]+?)/schemas(?:/)?$"
+    },
+    {
+      "page": "/api/datasources/[id]/test",
+      "regex": "^/api/datasources/([^/]+?)/test(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/datasources/(?<nxtPid>[^/]+?)/test(?:/)?$"
+    },
+    {
+      "page": "/api/docs/[id]",
+      "regex": "^/api/docs/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/docs/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/notification/jobs/[jobId]/logs/stream",
+      "regex": "^/api/notification/jobs/([^/]+?)/logs/stream(?:/)?$",
+      "routeKeys": {
+        "nxtPjobId": "nxtPjobId"
+      },
+      "namedRegex": "^/api/notification/jobs/(?<nxtPjobId>[^/]+?)/logs/stream(?:/)?$"
+    },
+    {
+      "page": "/api/notifications/exception-logs/[id]/retry",
+      "regex": "^/api/notifications/exception\\-logs/([^/]+?)/retry(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/notifications/exception\\-logs/(?<nxtPid>[^/]+?)/retry(?:/)?$"
+    },
+    {
+      "page": "/api/project/requirement/delete/[id]",
+      "regex": "^/api/project/requirement/delete/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/project/requirement/delete/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/project/requirement/get/[id]",
+      "regex": "^/api/project/requirement/get/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/project/requirement/get/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/project/requirement/[id]/analyze",
+      "regex": "^/api/project/requirement/([^/]+?)/analyze(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/project/requirement/(?<nxtPid>[^/]+?)/analyze(?:/)?$"
+    },
+    {
+      "page": "/api/project/requirement/[id]/lifecycle",
+      "regex": "^/api/project/requirement/([^/]+?)/lifecycle(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/project/requirement/(?<nxtPid>[^/]+?)/lifecycle(?:/)?$"
+    },
+    {
+      "page": "/api/project/requirement/[id]/review",
+      "regex": "^/api/project/requirement/([^/]+?)/review(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/project/requirement/(?<nxtPid>[^/]+?)/review(?:/)?$"
+    },
+    {
+      "page": "/api/schedule/events/[id]",
+      "regex": "^/api/schedule/events/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/schedule/events/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/schedule/events/[id]/complete",
+      "regex": "^/api/schedule/events/([^/]+?)/complete(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/schedule/events/(?<nxtPid>[^/]+?)/complete(?:/)?$"
+    },
+    {
+      "page": "/chat/[sessionId]",
+      "regex": "^/chat/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPsessionId": "nxtPsessionId"
+      },
+      "namedRegex": "^/chat/(?<nxtPsessionId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/func-docs/[docId]",
+      "regex": "^/func\\-docs/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPdocId": "nxtPdocId"
+      },
+      "namedRegex": "^/func\\-docs/(?<nxtPdocId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/func-docs/[docId]/features",
+      "regex": "^/func\\-docs/([^/]+?)/features(?:/)?$",
+      "routeKeys": {
+        "nxtPdocId": "nxtPdocId"
+      },
+      "namedRegex": "^/func\\-docs/(?<nxtPdocId>[^/]+?)/features(?:/)?$"
+    },
+    {
+      "page": "/orchestration/[workflowId]",
+      "regex": "^/orchestration/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPworkflowId": "nxtPworkflowId"
+      },
+      "namedRegex": "^/orchestration/(?<nxtPworkflowId>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin/integrations/baidu-pan",
+      "regex": "^/admin/integrations/baidu\\-pan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/integrations/baidu\\-pan(?:/)?$"
+    },
+    {
+      "page": "/admin/users",
+      "regex": "^/admin/users(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/users(?:/)?$"
+    },
+    {
+      "page": "/agent",
+      "regex": "^/agent(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/agent(?:/)?$"
+    },
+    {
+      "page": "/api/baidu-pan/auth/authorize-url",
+      "regex": "^/api/baidu\\-pan/auth/authorize\\-url(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/baidu\\-pan/auth/authorize\\-url(?:/)?$"
+    },
+    {
+      "page": "/api/baidu-pan/auth/status",
+      "regex": "^/api/baidu\\-pan/auth/status(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/baidu\\-pan/auth/status(?:/)?$"
+    },
+    {
+      "page": "/api/baidu-pan/auth/unbind",
+      "regex": "^/api/baidu\\-pan/auth/unbind(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/baidu\\-pan/auth/unbind(?:/)?$"
+    },
+    {
+      "page": "/api/datasources",
+      "regex": "^/api/datasources(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/datasources(?:/)?$"
+    },
+    {
+      "page": "/api/datasources/validate",
+      "regex": "^/api/datasources/validate(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/datasources/validate(?:/)?$"
+    },
+    {
+      "page": "/api/docs",
+      "regex": "^/api/docs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/docs(?:/)?$"
+    },
+    {
+      "page": "/api/life-countdown/current",
+      "regex": "^/api/life\\-countdown/current(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/life\\-countdown/current(?:/)?$"
+    },
+    {
+      "page": "/api/life-countdown/generate-warning",
+      "regex": "^/api/life\\-countdown/generate\\-warning(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/life\\-countdown/generate\\-warning(?:/)?$"
+    },
+    {
+      "page": "/api/life-countdown/save",
+      "regex": "^/api/life\\-countdown/save(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/life\\-countdown/save(?:/)?$"
+    },
+    {
+      "page": "/api/notification/recipients",
+      "regex": "^/api/notification/recipients(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/notification/recipients(?:/)?$"
+    },
+    {
+      "page": "/api/notification/send",
+      "regex": "^/api/notification/send(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/notification/send(?:/)?$"
+    },
+    {
+      "page": "/api/notifications/exception-logs",
+      "regex": "^/api/notifications/exception\\-logs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/notifications/exception\\-logs(?:/)?$"
+    },
+    {
+      "page": "/api/project/requirement/create",
+      "regex": "^/api/project/requirement/create(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/project/requirement/create(?:/)?$"
+    },
+    {
+      "page": "/api/project/requirement/history-options",
+      "regex": "^/api/project/requirement/history\\-options(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/project/requirement/history\\-options(?:/)?$"
+    },
+    {
+      "page": "/api/project/requirement/search",
+      "regex": "^/api/project/requirement/search(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/project/requirement/search(?:/)?$"
+    },
+    {
+      "page": "/api/project/requirement/update",
+      "regex": "^/api/project/requirement/update(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/project/requirement/update(?:/)?$"
+    },
+    {
+      "page": "/api/schedule/events",
+      "regex": "^/api/schedule/events(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/schedule/events(?:/)?$"
+    },
+    {
+      "page": "/api/statistics/themes/knowledge-mastery/dashboard",
+      "regex": "^/api/statistics/themes/knowledge\\-mastery/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/statistics/themes/knowledge\\-mastery/dashboard(?:/)?$"
+    },
+    {
+      "page": "/api/statistics/themes/question-bank/dashboard",
+      "regex": "^/api/statistics/themes/question\\-bank/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/statistics/themes/question\\-bank/dashboard(?:/)?$"
+    },
+    {
+      "page": "/api/statistics/themes/vocabulary-proficiency/dashboard",
+      "regex": "^/api/statistics/themes/vocabulary\\-proficiency/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/statistics/themes/vocabulary\\-proficiency/dashboard(?:/)?$"
+    },
+    {
+      "page": "/chat",
+      "regex": "^/chat(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/chat(?:/)?$"
+    },
+    {
+      "page": "/datasource",
+      "regex": "^/datasource(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/datasource(?:/)?$"
+    },
+    {
+      "page": "/diary",
+      "regex": "^/diary(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/diary(?:/)?$"
+    },
+    {
+      "page": "/docs",
+      "regex": "^/docs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/docs(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/func-docs",
+      "regex": "^/func\\-docs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/func\\-docs(?:/)?$"
+    },
+    {
+      "page": "/groups",
+      "regex": "^/groups(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/groups(?:/)?$"
+    },
+    {
+      "page": "/hot-search",
+      "regex": "^/hot\\-search(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/hot\\-search(?:/)?$"
+    },
+    {
+      "page": "/knowledge/mastery",
+      "regex": "^/knowledge/mastery(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/knowledge/mastery(?:/)?$"
+    },
+    {
+      "page": "/knowledge/personal",
+      "regex": "^/knowledge/personal(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/knowledge/personal(?:/)?$"
+    },
+    {
+      "page": "/knowledge/sets",
+      "regex": "^/knowledge/sets(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/knowledge/sets(?:/)?$"
+    },
+    {
+      "page": "/life-countdown",
+      "regex": "^/life\\-countdown(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/life\\-countdown(?:/)?$"
+    },
+    {
+      "page": "/mcp-server",
+      "regex": "^/mcp\\-server(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/mcp\\-server(?:/)?$"
+    },
+    {
+      "page": "/mcp-tool",
+      "regex": "^/mcp\\-tool(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/mcp\\-tool(?:/)?$"
+    },
+    {
+      "page": "/menu",
+      "regex": "^/menu(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/menu(?:/)?$"
+    },
+    {
+      "page": "/notification/send",
+      "regex": "^/notification/send(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/notification/send(?:/)?$"
+    },
+    {
+      "page": "/notifications/exception-logs",
+      "regex": "^/notifications/exception\\-logs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/notifications/exception\\-logs(?:/)?$"
+    },
+    {
+      "page": "/open/baidu-pan/auth/callback",
+      "regex": "^/open/baidu\\-pan/auth/callback(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/open/baidu\\-pan/auth/callback(?:/)?$"
+    },
+    {
+      "page": "/orchestration",
+      "regex": "^/orchestration(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/orchestration(?:/)?$"
+    },
+    {
+      "page": "/price-monitor",
+      "regex": "^/price\\-monitor(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/price\\-monitor(?:/)?$"
+    },
+    {
+      "page": "/schedule",
+      "regex": "^/schedule(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/schedule(?:/)?$"
+    },
+    {
+      "page": "/statistics-center/question-bank",
+      "regex": "^/statistics\\-center/question\\-bank(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/statistics\\-center/question\\-bank(?:/)?$"
+    },
+    {
+      "page": "/subjects",
+      "regex": "^/subjects(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/subjects(?:/)?$"
+    },
+    {
+      "page": "/system/roles",
+      "regex": "^/system/roles(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/system/roles(?:/)?$"
+    },
+    {
+      "page": "/todo",
+      "regex": "^/todo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/todo(?:/)?$"
+    },
+    {
+      "page": "/vocabulary",
+      "regex": "^/vocabulary(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/vocabulary(?:/)?$"
+    },
+    {
+      "page": "/vocabulary/proficiency",
+      "regex": "^/vocabulary/proficiency(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/vocabulary/proficiency(?:/)?$"
+    },
+    {
+      "page": "/vocabulary/review",
+      "regex": "^/vocabulary/review(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/vocabulary/review(?:/)?$"
+    },
+    {
+      "page": "/wrong-question",
+      "regex": "^/wrong\\-question(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/wrong\\-question(?:/)?$"
+    },
+    {
+      "page": "/wxapp",
+      "regex": "^/wxapp(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/wxapp(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
